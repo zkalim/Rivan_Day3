@@ -2623,7 +2623,7 @@ show ip nat translations
 10.1.1.10 = R4
 
 ~~~
-!@D1, R2, R4
+!@R2, R3, R4
 ping 8.8.8.8
 ~~~
 
