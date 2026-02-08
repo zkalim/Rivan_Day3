@@ -1,0 +1,202 @@
+day3 ipV6
+exam lab
+
+cafe:cafe:cafe:1212::48 subnet mo 512 subnets
+
+48+9bits = /57
+
+config t
+int lo 1
+ ipv6 add cafe:cafe:cafe:0000::f/57
+int lo 2
+ ipv6 add cafe:cafe:cafe:0080::f/57
+int lo 3
+ ipv6 add cafe:cafe:cafe:0100::f/57
+int lo 4
+ ipv6 add cafe:cafe:cafe:0180::f/57
+int lo 5
+ ipv6 add cafe:cafe:cafe:0200::f/57
+int lo 6
+ ipv6 add cafe:cafe:cafe:0280::f/57
+ do sh ipv6 int brief
+
+examlab#2
+
+
+
+bebe:baba:caca:dada::/64 subnet to: 32 subnets:0000,0800,1000,1800,2000,2800
+
+64+5 = /69
+config t
+int lo 1
+ ipv6 add bebe:baba:caca:dada:0000::/69
+int lo 2
+ ipv6 add bebe:baba:caca:dada:0800::/69
+int lo 3
+ ipv6 add bebe:baba:caca:dada:1000::/69
+int lo 4
+ ipv6 add bebe:baba:caca:dada:1800::/69
+int lo 5
+ ipv6 add bebe:baba:caca:dada:2000::/69
+int lo 6
+ ipv6 add bebe:baba:caca:dada:2800::/69
+ do sh ipv6 int brief
+
+
+P1: static route: vlan 20, vlan 100
+@p1:
+config t
+ip route 10.2.2.0 255.255.255.0 10.2.1.1 1
+ip route 10.2.2.0 255.255.255.0 10.2.1.2 5 
+ip route 192.168.1.128 255.255.255.224 10.2.1.1 1
+ip route 192.168.1.128 255.255.255.224 10.2.1.2 5
+!!dahil endpoint default route:
+ip route 0.0.0.0 0.0.0.0 10.2.1.1 1
+ip route 0.0.0.0 0.0.0.0 10.2.1.2 5
+end
+show run | inc route
+
+@Corebaba
+config t
+no logging console
+enable secret pass
+Int vlan 1
+no shut
+ip add 10.61.1.4 255.255.255.0
+router eigrp 100
+network 10.0.0.0
+router ospf 1
+network 0.0.0.0 255.255.255.255 area 0
+router bgp 1
+network 10.0.0.0
+end
+
+
+@R4
+conf t
+int e3/3
+ no shut
+ ip add dhcp
+ ip ospf 1 area 0
+ exit
+ router eigrp 100
+ network 208.8.8.0 0.0.0.255
+ end
+
+
+STATIC 1
+EIGRP 90
+OSPF 110
+EBGP 20
+ IBGP 200
+ISIS 115
+RIP 120
+
+
+!@R2
+conf t
+ router ospf 1
+  area 12 range 10.10.32.0 255.255.252.0
+  end
+
+
+!@R2
+conf t
+ int lo7
+ ip address 10.10.7.1 255.255.255.255
+ ip ospf 1 area 12
+ end
+
+
+!@S1
+conf t
+ int e1/0
+  no shut
+  ip add 69.69.69.1 255.255.255.0
+ exit
+router bgp 11
+ neighbor 69.69.69.2 remote-as 12
+ network 69.69.69.0 mask 255.255.255.0
+ end
+
+!@D1
+conf t
+ int e3/3
+ no sw
+ no shut
+ ip add dhcp
+ exit
+ monitor session 1 source interface e1/0
+ monitor session 1 destination int e3/3
+ end
+
+!@D1
+conf t
+ int e1/0
+  no switchport
+  ip add 69.69.69.2 255.255.255.0
+ no shut
+ exit
+ router bgp 12
+ neighbor 69.69.69.1 remote-as 12
+ network 69.69.69.0 mask 255.255.255.0
+end
+ 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+!@I3 - GLOBE
+conf t
+ router bgp 3
+  bgp log-neighbor-changes
+  neighbor 209.9.9.1 remote-as 1
+  neighbor 32.3.2.2 remote-as 2
+  neighbor 35.3.5.5 remote-as 45
+  address-family ipv4
+   neighbor 209.9.9.1 activate
+   neighbor 32.3.2.2 activate
+   neighbor 35.3.5.5 activate
+   network  32.3.2.0 mask 255.255.255.0
+   network  35.3.5.0 mask 255.255.255.0
+   network  209.9.9.0 mask 255.255.255.0
+   network  33.33.33.33 mask 255.255.255.255
+   end
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+!@R1
+conf t
+ ip nat inside source static 10.1.4.6  208.8.8.99
+ ip nat inside source static 10.1.4.10  207.7.7.66
+ end 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+!@R1
+conf t 
+ ip nat inside source static 10.2.1.101 207.7.7.201
+ ip nat inside source static 10.2.1.102 208.8.8.202
+ ip nat inside source static 10.2.2.133 209.9.9.203
+ end
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+!@R4
+conf t
+ ipv6 unicast-routing
+ int e0/0
+ no shut
+ ipv6 add 2001:db8::8000:0:0/82 eui-64
+ end
+ show ipv6 int brief
+bp6
+
+DHCPv6
+int = ipv6 autoconfig
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+2001:0100:000:0001:ffff:ffff:ffff:ff7f/64
+  
