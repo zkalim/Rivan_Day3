@@ -286,10 +286,6 @@ Devices
 Secret: pass
 ~~~
 
-<br>
-
-![RST_IPv4](img/rstIPv4.png)
-
 &nbsp;
 ---
 &nbsp;
@@ -899,17 +895,6 @@ conf t
 ---
 &nbsp;
 
-### How devices forward IP Packets.
-
-![RST_IPv4](img/OSPF_only.png)
-
-
-<br>
-<br>
-
----
-&nbsp;
-
 ### Static Route via Exit Interface
 
 Configure a static host route on R3, destined for R4's 10.1.4.9 IP using both a next-hop address and interface.
@@ -1382,10 +1367,6 @@ show ip eigrp topology
 
 ### EIGRP Metric
 *EIGRP Metric Formula*
-
-<br>
-
-![RST_IPv4](img/EIGRP_only.png)
 
 <br>
 
