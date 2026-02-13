@@ -1,0 +1,249 @@
+Day3-Lab Homework
+
+192.168.42.128
+
+1. Assign IP address on P1, P2, S1, S2
+	P1 = 10.2.1.101 /24 VLAN 10
+	P2 = 10.2.1.102 /24 VLAN 10
+	S1 = 192.168.1.133 /27 VLAN 100
+	S2 = 10.2.2.133 /24 VLAN 20
+2. Assign them to the correct VLANs
+3. Default, Floating Static Default Route
+
+!@P1
+conf t
+ ip route 0.0.0.0 0.0.0.0 10.2.1.1 
+ ip route 0.0.0.0 0.0.0.0 10.2.1.2 10
+ end
+
+!@S1
+conf t
+ ip route 0.0.0.0 0.0.0.0 192.168.1.129
+ end
+
+!@P2
+conf t
+ ip route 0.0.0.0 0.0.0.0 10.2.1.2 
+ ip route 0.0.0.0 0.0.0.0 10.2.1.1 10
+ end
+
+!@S2
+conf t
+ ip route 0.0.0.0 0.0.0.0 10.2.2.2
+ end
+
+4. EIGRP
+
+!@D1
+conf t
+ router eigrp 100
+  network 10.2.1.0 0.0.0.255
+  network 10.2.2.0 0.0.0.255
+  network 192.168.1.128 0.0.0.31
+  network 10.1.4.4 0.0.0.3
+  end
+
+!@D2
+conf t
+ router eigrp 100
+  network 10.2.1.0 0.0.0.255
+  network 10.2.2.0 0.0.0.255
+  network 192.168.1.128 0.0.0.31
+  network 10.1.4.8 0.0.0.3
+  end
+
+!@R4
+conf t
+ router eigrp 100
+   network 10.1.4.4 0.0.0.3
+   network 10.1.4.8 0.0.0.3
+   end
+
+5. OSPF
+
+!@R4
+conf t
+ int e1/2
+  ip ospf network point-to-point
+  exit
+ router ospf 1
+  router-id 4.4.4.4
+  network 4.4.4.4 0.0.0.0 area 0
+  network 10.1.1.8 0.0.0.3 area 0
+  end
+
+!@R3
+conf t
+  int e1/2
+  ip ospf network point-to-point
+  exit
+ router ospf 1
+  router-id 3.3.3.3
+  network 3.3.3.3 0.0.0.0 area 0
+  network 10.1.1.8 0.0.0.3 area 0
+  network 10.1.1.4 0.0.0.3 area 0
+  end
+
+!@R2
+conf t
+  int e1/2
+  ip ospf network point-to-point
+  ip ospf priority 255
+  exit
+ router ospf 1
+  router-id 2.2.2.2
+  network 2.2.2.2 0.0.0.0 area 0
+  network 10.1.1.4 0.0.0.3 area 0
+  network 10.1.1.0 0.0.0.3 area 0
+  end
+
+!@R1
+conf t
+ int e1/0
+  ip ospf network point-to-point
+  ip ospf priority 0
+  exit
+ router ospf 1
+  router-id 1.1.1.1
+  network 1.1.1.1 0.0.0.0 area 0
+  network 10.1.1.1 0.0.0.3 area 0
+  end
+
+
+6. Point-to-point, Priority
+7. BGP
+
+!@R1
+conf t
+ router bgp 1
+  bgp log-neighbor-changes
+  neighbor 209.9.9.3 remote-as 3
+  neighbor 207.7.7.2 remote-as 2
+  neighbor 208.8.8.4 remote-as 45
+  address-family ipv4
+   neighbor 209.9.9.3 activate
+   neighbor 208.8.8.4 activate
+   network 209.9.9.0 mask 255.255.255.0
+   network 207.7.7.0 mask 255.255.255.0
+   network 208.8.8.0 mask 255.255.255.0
+   end
+
+!@I2
+conf t
+ router bgp 2
+  bgp log-neighbor-changes
+  neighbor 32.3.2.3 remote-as 3
+  neighbor 25.2.5.5 remote-as 45
+  neighbor 24.2.4.4 remote-as 45
+  neighbor 207.7.7.1 remote-as 1
+  address-family ipv4
+   neighbor 32.3.2.3 activate
+   neighbor 25.2.5.5 activate
+   neighbor 24.2.4.4 activate
+   neighbor 207.7.7.1 activate
+   network 22.22.22.22 mask 255.255.255.255
+   network 32.3.2.0 mask 255.255.255.0
+   network 25.2.5.0 mask 255.255.255.0
+   network 24.2.4.0 mask 255.255.255.0
+   network 207.7.7.0 mask 255.255.255.0
+   end
+
+!@I3
+conf t
+ router bgp 3
+  bgp log-neighbor-changes
+  neighbor 35.3.5.5 remote-as 45
+  neighbor 32.3.2.2 remote-as 2
+  neighbor 209.9.9.1 remote-as 1
+   address-family ipv4
+   neighbor 35.3.5.5 activate
+   neighbor 32.3.2.2 activate
+   neighbor 209.9.9.1 activate
+   network 33.33.33.33 mask 255.255.255.255
+   network 35.3.5.0 mask 255.255.255.0
+   network 32.3.2.0 mask 255.255.255.0
+   network 209.9.9.0 mask 255.255.255.0
+   end
+
+!@I1
+conf t
+ router bgp 45
+  bgp log-neighbor-changes
+  neighbor 45.4.5.5 remote-as 45
+  neighbor 24.2.4.2 remote-as 2
+  neighbor 208.8.8.1 remote-as 1
+   address-family ipv4
+   neighbor 45.4.5.5 activate
+   neighbor 24.2.4.2 activate
+   neighbor 208.8.8.1 activate
+   network 44.44.44.44 mask 255.255.255.255
+   network 45.4.5.0 mask 255.255.255.0
+   network 24.2.4.0 mask 255.255.255.0
+   network 208.8.8.0 mask 255.255.255.0
+   end
+
+!@I4GOOGLE
+conf t
+ router bgp 45
+  bgp log-neighbor-changes
+  neighbor 25.2.5.2 remote-as 2
+  neighbor 35.3.5.3 remote-as 3
+  neighbor 45.4.5.4 remote-as 45
+   address-family ipv4
+   neighbor 25.2.5.2 activate
+   neighbor 35.3.5.3 activate
+   neighbor 45.4.5.4 activate
+   network 55.55.55.55 mask 255.255.255.255
+   network 8.8.8.8 mask 255.255.255.255
+   network 25.2.5.0 mask 255.255.255.0
+   network 35.3.5.0 mask 255.255.255.0
+   network 45.4.5.0 mask 255.255.255.0
+   end
+
+8. Redistribution Routes
+
+!@R4
+conf t
+ router ospf 1
+  redistribute eigrp 100 subnets
+  exit
+ router eigrp 100
+  redistribute ospf 1 metric 10000 100 255 1 1500
+  end
+
+!@R1
+conf t
+ router ospf 1
+  default-information originate always
+  end 
+
+
+9. Nat
+
+P1 = 209.9.9.10 
+P2 = 209.9.9.20
+S1 = 207.7.7.10
+S2 = 208.8.8.10
+
+!@R1
+conf t
+ int range e1/1-3
+  ip nat outside
+ int e1/0
+  ip nat inside
+!
+access-list 1 permit 10.0.0.0 0.255.255.255
+access-list 1 permit 172.16.0.0 0.15.255.255
+access-list 1 permit 192.168.0.0 0.0.255.255
+!
+ip nat inside source static 10.2.1.101 209.9.9.10
+ip nat inside source static 10.2.1.102 209.9.9.20
+ip nat inside source static 192.168.1.133 207.7.7.10
+ip nat inside source static 10.2.2.133 208.8.8.10
+!
+ip nat inside source list 1 int e1/2 overload
+end
+
+
+
+
